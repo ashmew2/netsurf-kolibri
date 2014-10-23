@@ -152,7 +152,50 @@ static void nskol_window_reformat(struct gui_window *gw)
 	}
 }
 
+/**
+ * Core asks front end for clipboard contents.
+ *
+ * \param  buffer  UTF-8 text, allocated by front end, ownership yeilded to core
+ * \param  length  Byte length of UTF-8 text in buffer
+ */
+static void gui_get_clipboard(char **buffer, size_t *length)
+{
+  
+  
+  int clipboard_address = kol_get_clipboard_data();
+  char *clipboard_data = NULL;
 
+  if(clipboard_address!=1 && clipboard_address!=-1)
+    clipboard_data = (char *)clipboard_address;
+
+  *length = strlen(clipboard_data);
+  
+  memcpy(*buffer, clipboard_data, *length);
+  //The data is copied into buffer and length is set to buffer length.
+
+}
+
+
+/**
+ * Core tells front end to put given text in clipboard
+ *
+ * \param  buffer    UTF-8 text, owned by core
+ * \param  length    Byte length of UTF-8 text in buffer
+ * \param  styles    Array of styles given to text runs, owned by core, or NULL
+ * \param  n_styles  Number of text run styles in array
+ */
+static void gui_set_clipboard(const char *buffer, size_t length,
+		nsclipboard_styles styles[], int n_styles)
+{
+  //ignoring styles for now. Will add them later (fancy stuff :P)
+  kol_set_clipboard_data(buffer, (int)length);
+}
+
+
+static struct gui_clipboard_table clipboard_table = {
+	.get = gui_get_clipboard,
+	.set = gui_set_clipboard,
+};
 
 static struct gui_window_table window_table = {
 	.create = gui_window_create,
