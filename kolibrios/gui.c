@@ -32,6 +32,8 @@ struct gui_window {
 struct gui_download_window {
   struct gui_download_window *next, *prev;
   struct download_context *ctx;
+
+  FILE *file_handle;
   
   char *name;
   unsigned long bytes_size;
@@ -223,13 +225,18 @@ static void gui_set_clipboard(const char *buffer, size_t length,
 static struct gui_download_window * gui_download_window_create(struct download_context *ctx, struct gui_window *parent)
 {
   gui_download_window *new_dl_window = (gui_download_window *)malloc(sizeof(gui_download_window));
-  
+  FILE *write_handle;
+
+  write_handle = fopen(download_context_get_filename(ctx), "wb"); //This is probably correct (wb mode)
+
   new_dl_window->next = NULL;
   new_dl_window->next = NULL;
   new_dl_window->bytes_size = download_context_get_total_length(ctx);
   new_dl_window->bytes_downloaded = 0;
   new_dl_window->bytes_remaining = new_dl_window->bytes_size;
-  
+
+  new_dl_window->file_handle = ;
+
   new_dl_window->status = 0;
 
   if(parent->main_dl == NULL)
@@ -248,6 +255,27 @@ static struct gui_download_window * gui_download_window_create(struct download_c
   // parent gui window.
 
 }
+
+nserror gui_download_window_data(struct gui_download_window *dw, const char *data, unsigned int size)
+{
+  //Seems like this function is responsible for getting the downloaded data. 
+  //Not sure if the file pointer should be written here. But apparently, it should be.
+  //Download_window should have a low lying file handle to which bytes are being written.
+
+  if(dw->file_handle)
+    fwrite(data, sizeof(char), size, dw->file_handle); //Handle fwrite errors? They shouldn't occur normally.
+  else
+    {
+      //error condition! The file stream we opened earlier didn't work out well, ABORT.
+      dw->status = -1; //Invalidates the file transfer. use the download status enum here.
+      //This status can be used to "Clear" the downloaded files etc 
+    }
+}
+
+void (*error)(struct gui_download_window *dw, const char *error_msg);
+
+void (*done)(struct gui_download_window *dw);
+
 
 static struct gui_download_table download_table = {
 	.create = gui_download_window_create,
