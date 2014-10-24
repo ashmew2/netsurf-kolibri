@@ -24,7 +24,12 @@ struct gui_window {
   int width, height;
 };
 
+//There needs to be one gui_download_window and more rows (downloads) can be added/removed from it.
+//gui_download_window represents one row of the download_window. There should be a parent window gui_window (type)
+
 struct gui_download_window {
+  struct gui_download_window *next, *prev;
+
   struct download_context *ctx;
   
   char *name;
@@ -37,6 +42,7 @@ struct gui_download_window {
   int status;
   
   //Need another entry for specifying row number in the download table (might change as downloads are added/removed).
+  //or maybe just follow the order of the linked list.
 
   //add an enum for DOWNLOAD_PAUSED, DOWNLOAD_RUNNING, DOWNLOAD_FINISHED, DOWNLOAD_STOPPED
 
