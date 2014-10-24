@@ -16,9 +16,10 @@ inline void f65(unsigned x, unsigned y, unsigned w, unsigned h, char *d)
 
 enum download_status {
   DOWNLOAD_DOWNLOADING;
+  DOWNLOAD_PAUSED;
   DOWNLOAD_FINISHED;
-  DOWNLOAD_STOPPED;
   DOWNLOAD_ERROR;
+  DOWNLOAD_STOPPED;
 };
 
 struct gui_window {
@@ -48,7 +49,7 @@ struct gui_download_window {
   double speed;
 
   //add an enum for DOWNLOAD_PAUSED, DOWNLOAD_RUNNING, DOWNLOAD_FINISHED, DOWNLOAD_STOPPED
-  int status;
+  download_status status;
   
   //Need another entry for specifying row number in the download table (might change as downloads are added/removed).
   //or maybe just follow the order of the linked list.
@@ -242,7 +243,7 @@ static struct gui_download_window * gui_download_window_create(struct download_c
 
   new_dl_window->file_handle = ;
 
-  new_dl_window->status = 0;
+  new_dl_window->status = DOWNLOAD_DOWNLOADING;
 
   if(parent->main_dl == NULL)
     parent->main_dl = new_dl_window;
@@ -272,7 +273,7 @@ nserror gui_download_window_data(struct gui_download_window *dw, const char *dat
   else
     {
       //error condition! The file stream we opened earlier didn't work out well, ABORT.
-      dw->status = -1; //Invalidates the file transfer. use the download status enum here.
+      dw->status = DOWNLOAD_ERROR; //Invalidates the file transfer. use the download status enum here.
       //This status can be used to "Clear" the downloaded files etc 
     }
 }
@@ -282,7 +283,18 @@ void gui_download_window_error(struct gui_download_window *dw, const char *error
   dw->status = DOWNLOAD_ERROR;
 }
 
-void gui_download_window_done(struct gui_download_window *dw);
+void gui_download_window_done(struct gui_download_window *dw)
+{
+  dw->status = DOWNLOAD_FINISHED;
+  fclose(dw->file_handle);
+  
+  LOG(("Download finished...it's size/downloaded/remaining : %lu/%lu/%lu", dw->bytes_size, dw->bytes_downloaded, dw->bytes_remaining));
+
+  dw->bytes_remaining = 0;
+  dw->speed = 0.00;
+
+  //Consider some auto clear mode where finished downloads are automatically cleared, Shouldn't be too hard.
+}
 
 
 static struct gui_download_table download_table = {
