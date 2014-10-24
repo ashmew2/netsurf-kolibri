@@ -22,8 +22,29 @@ struct gui_window {
   struct browser_window *bw;
   
   int width, height;
+};
+
+struct gui_download_window {
+  struct download_context *ctx;
+  
+  char *name;
+  unsigned int bytes_size;
+  unsigned long bytes_downloaded;
+  unsigned long bytes_remaining;
+
+  double speed;
+
+  int status;
+  
+  //Need another entry for specifying row number in the download table (might change as downloads are added/removed).
+
+  //add an enum for DOWNLOAD_PAUSED, DOWNLOAD_RUNNING, DOWNLOAD_FINISHED, DOWNLOAD_STOPPED
+
+  //progress can be calculated on the fly, not sure if it should have a separate field
+  //can have more stuff like time_started (for elapsed time)
   
 };
+
 
 static void gui_window_destroy(struct gui_window *g)
 {
@@ -191,6 +212,17 @@ static void gui_set_clipboard(const char *buffer, size_t length,
   kol_set_clipboard_data(buffer, (int)length);
 }
 
+static struct gui_download_window * gui_download_window_create(struct download_context *ctx, struct gui_window *parent)
+{
+}
+
+
+static struct gui_download_table download_table = {
+	.create = gui_download_window_create,
+	.data = gui_download_window_data,
+	.error = gui_download_window_error,
+	.done = gui_download_window_done,
+};
 
 static struct gui_clipboard_table clipboard_table = {
 	.get = gui_get_clipboard,
@@ -229,6 +261,7 @@ int main()
 		.browser = &nskol_browser_table,
 		.window = nskol_window_table,
 		.clipboard = nskol_clipboard_table,
+
 		.download = nskol_download_table,
 		.fetch = nskol_fetch_table,
 		.llcache = filesystem_llcache_table,
