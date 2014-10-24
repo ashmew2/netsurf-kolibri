@@ -14,7 +14,12 @@ inline void f65(unsigned x, unsigned y, unsigned w, unsigned h, char *d)
     asm("popa");
 }
 
-
+enum download_status {
+  DOWNLOAD_DOWNLOADING;
+  DOWNLOAD_FINISHED;
+  DOWNLOAD_STOPPED;
+  DOWNLOAD_ERROR;
+};
 
 struct gui_window {
   
