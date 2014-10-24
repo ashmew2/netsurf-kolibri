@@ -296,6 +296,33 @@ void gui_download_window_done(struct gui_download_window *dw)
   //Consider some auto clear mode where finished downloads are automatically cleared, Shouldn't be too hard.
 }
 
+const char *fetch_filetype(const char *unix_path)
+{
+  //can add more mime types (check out gtk/fetch.c gtk_fetch_filetype_init function)
+  int len = strlen(unix_path);
+
+  for(; len > 0; len--)
+    if(unix_path[len]=='.')
+      break;
+
+  if(!strcmp(unix_path + len, ".png"))
+    return "image/png";
+  else   if(!strcmp(unix_path + len, ".css"))
+    return "text/css";
+  else   if(!strcmp(unix_path + len, ".html"))
+    return "text/html";
+  else   if(!strcmp(unix_path + len, ".txt"))
+    return "text/plain";
+  else
+    return "text/plain";
+
+}
+
+
+static struct gui_fetch_table fetch_table = {
+	.filetype = fetch_filetype,
+	
+};
 
 static struct gui_download_table download_table = {
 	.create = gui_download_window_create,
