@@ -272,9 +272,12 @@ nserror gui_download_window_data(struct gui_download_window *dw, const char *dat
     }
 }
 
-void (*error)(struct gui_download_window *dw, const char *error_msg);
+void gui_download_window_error(struct gui_download_window *dw, const char *error_msg)
+{
+  dw->status = DOWNLOAD_ERROR;
+}
 
-void (*done)(struct gui_download_window *dw);
+void gui_download_window_done(struct gui_download_window *dw);
 
 
 static struct gui_download_table download_table = {
