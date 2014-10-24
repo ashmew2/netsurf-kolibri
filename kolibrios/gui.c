@@ -20,6 +20,8 @@ struct gui_window {
   
   struct gui_window *next, *prev;
   struct browser_window *bw;
+
+  gui_download_window main_dl;
   
   int width, height;
 };
@@ -29,22 +31,20 @@ struct gui_window {
 
 struct gui_download_window {
   struct gui_download_window *next, *prev;
-
   struct download_context *ctx;
   
   char *name;
-  unsigned int bytes_size;
+  unsigned long bytes_size;
   unsigned long bytes_downloaded;
   unsigned long bytes_remaining;
 
   double speed;
 
+  //add an enum for DOWNLOAD_PAUSED, DOWNLOAD_RUNNING, DOWNLOAD_FINISHED, DOWNLOAD_STOPPED
   int status;
   
   //Need another entry for specifying row number in the download table (might change as downloads are added/removed).
   //or maybe just follow the order of the linked list.
-
-  //add an enum for DOWNLOAD_PAUSED, DOWNLOAD_RUNNING, DOWNLOAD_FINISHED, DOWNLOAD_STOPPED
 
   //progress can be calculated on the fly, not sure if it should have a separate field
   //can have more stuff like time_started (for elapsed time)
@@ -77,8 +77,10 @@ struct gui_window * gui_window_create(struct browser_window *bw,
   new_window->bw = bw;  
   bw->window = new_window; //or the old one itself??
 
-  gui_window->width = 1024;
-  gui_window->height = 768;
+  new_window->width = 1024;
+  new_window->height = 768;
+  
+  new_window->main_dl = NULL;
   
   kol_wnd_define(0,0,gui_window->width , gui_window->height,  0x13FFFFFF, 1, "Netsurf - KolibriOS");
 
@@ -220,8 +222,32 @@ static void gui_set_clipboard(const char *buffer, size_t length,
 
 static struct gui_download_window * gui_download_window_create(struct download_context *ctx, struct gui_window *parent)
 {
-}
+  gui_download_window *new_dl_window = (gui_download_window *)malloc(sizeof(gui_download_window));
+  
+  new_dl_window->next = NULL;
+  new_dl_window->next = NULL;
+  new_dl_window->bytes_size = download_context_get_total_length(ctx);
+  new_dl_window->bytes_downloaded = 0;
+  new_dl_window->bytes_remaining = new_dl_window->bytes_size;
+  
+  new_dl_window->status = 0;
 
+  if(parent->main_dl == NULL)
+    parent->main_dl = new_dl_window;
+  else
+    {
+      gui_download_window *temp = parent->main_dl;
+      
+      while(temp->next!=NULL)
+	temp = temp->next;
+      
+      temp->next = new_dl;
+      new_dl->prev = temp;      
+    }
+  //Need a function such as add_download_to_gui which creates a row in the download window which is pointed to by the
+  // parent gui window.
+
+}
 
 static struct gui_download_table download_table = {
 	.create = gui_download_window_create,
