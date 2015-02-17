@@ -1,8 +1,12 @@
+#include "edit_box.h"
+#define __stdcall __attribute__((stdcall))
+
+extern unsigned int (* __stdcall edit_box_draw)();
+
 dword_func *edit_box_draw =(dword_func*) &aEdit_box_draw;
 dword_func *edit_box_key =(dword_func*) &aEdit_box_key;
 dword_func *edit_box_mouse =(dword_func*) &aEdit_box_mouse;
-
-
+dword_func *edit_box_set_text =(dword_func*) &aEdit_box_set_text;
 
 //char lib_path[] = "/sys/lib/box_lib.obj";
 char lib_path[] = "/sys/lib/box_lib.obj";
@@ -32,80 +36,22 @@ void BOX_INIT()
  else
    __menuet__debug_out("\nbox_init() initialised properly.\n");
 
-
-http_get = ( __stdcall  unsigned int (*)(char*, char*)) 
+  /*dword_func *edit_box_draw =(dword_func*) &aEdit_box_draw;
+    dword_func *edit_box_key =(dword_func*) &aEdit_box_key;
+    dword_func *edit_box_mouse =(dword_func*) &aEdit_box_mouse;
+  */
+  
+  edit_box_draw = ( __stdcall  unsigned int (*)(char*, char*)) 
 		__kolibri__cofflib_getproc  (imp, "get");
-if (http_get == NULL)
+
+  if (edit_box_draw == NULL)
   {
     __menuet__debug_out("http_get() is NULL. Exiting.\n");
     kol_exit();
   }
-http_free = ( __stdcall  void (*)(unsigned int)) 
-		__kolibri__cofflib_getproc  (imp, "free");
-if (http_free == NULL)
-  {
-    __menuet__debug_out("http_free() is NULL. Exiting.\n");
-    kol_exit();
-  }	
-http_receive = ( __stdcall  int (*)(unsigned int))
-		__kolibri__cofflib_getproc  (imp, "receive");
 
-if (http_receive == NULL)
-  {
-    __menuet__debug_out("http_receive() is NULL. Exiting.\n");
-    kol_exit();
-  }
-
-http_find_header_field = ( __stdcall  char *(*)(struct http_msg*, char *)) 
-		__kolibri__cofflib_getproc  (imp, "find_header_field");
-if (http_find_header_field == NULL)
-  {
-    __menuet__debug_out("http_find_header_field() is NULL. Exiting.\n");
-    kol_exit();
-  }
-
-http_unescape_url = ( __stdcall  char *(*)(char *))
-  __kolibri__cofflib_getproc  (imp, "unescape");
-
-if(http_unescape_url == NULL)
-  {
-    __menuet__debug_out("http_unescape_url() is NULL. Exiting.\n");
-    kol_exit();
-  }
-
- http_post = ( __stdcall  char *(*)(char *, char *, char *, int))
-  __kolibri__cofflib_getproc  (imp, "post");
-
- if(http_post == NULL)
-   {
-     __menuet__debug_out("http_post() is NULL. Exiting.\n");
-     kol_exit();
-  }
-
-
- http_send = ( __stdcall  int (*)(struct http_msg *, char *, unsigned int))
-  __kolibri__cofflib_getproc  (imp, "send");
-
- if(http_send == NULL)
-   {
-     __menuet__debug_out("http_send() is NULL. Exiting.\n");
-     kol_exit();
-  }
-
- 
- http_disconnect = ( __stdcall  void (*)(struct http_msg *))
-  __kolibri__cofflib_getproc  (imp, "disconnect");
-
- if(http_disconnect == NULL)
-   {
-     __menuet__debug_out("http_disconnect() is NULL. Exiting.\n");
-     kol_exit();
-  }
-
- 
-
-__menuet__debug_out("HTTP init...\n");
-HTTP_YAY();
+  __menuet__debug_out("box_lib_init init...\n");
+/* HTTP_YAY(); */
 
 __menuet__debug_out("ok...\n");
 
@@ -114,7 +60,7 @@ __menuet__debug_out("ok...\n");
 
 
 
- 
+/* 
 	kol_struct_import *k = kol_cofflib_load(lib_path);
 
 	if (k == NULL)
@@ -131,4 +77,5 @@ __menuet__debug_out("ok...\n");
 
 	if (edit_box_draw == NULL || edit_box_key == NULL || edit_box_mouse == NULL)
 		rtlDebugOutString("some of functions cannot be loaded!");
+*/
 }
