@@ -4,4 +4,13 @@ Attempts to make a GUI using boxLIB and using http.obj for network tasks
 instead of libcurl.
 
 Let's see where this leads us!
+
+Once the GUI is up, the makefiles need to be patched for netsurf build 
+system.
+
+Once that is done, the toolchain from $MENUETDEV needs to be used for 
+building.
+
+Once that's finished, we should be good to go!
+
 ---------------------------
