@@ -14,3 +14,20 @@ building.
 Once that's finished, we should be good to go!
 
 ---------------------------
+
+For making changes to the GUI :
+
+Edit the guitest.c file using the KolibriOS functions and events from sysfuncs.txt
+
+Once you are done, make it using
+
+make
+
+in the same directory.
+
+If there are no syntax errors in the code, it will give you a file called _gui.
+
+Transfer _gui to KolibriOS and run it to see your changes!
+
+Also, you need to set up $MENUETDEV and point to correct path on Linux machine.
+
